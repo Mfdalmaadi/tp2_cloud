@@ -1,27 +1,34 @@
-require("dotenv").config();
-const host = process.env.HOST;
-const port = process.env.PORT;
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const app = express();
+require("dotenv").config();
 
+const app = express();
+const port = process.env.PORT || 3000;
+
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-mongoose.connect(process.env.URL_MONGOOSE);
-const db = mongoose.connection;
-db.on("error", (err) => console.log("DB connection error"));
-db.once("open", () => console.log("Connected"));
+// Connect to MongoDB
+mongoose
+  .connect(`${process.env.URL_MONGOOSE}/${process.env.DBNAME}`, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("Connected to MongoDB"))
+  .catch((err) => console.error("Failed to connect to MongoDB", err));
 
-const chefs = require("./Routes/Chef");
-const recettes = require("./Routes/Recette");
-const restaurants = require("./Routes/Restaurant");
+// Routes
+const chefsRoute = require("./routes/chef");
+const recettesRoute = require("./routes/recette");
+const restaurantsRoute = require("./routes/restaurant");
 
-app.use("/chefs", chefs);
-app.use("/recettes", recettes);
-app.use("/restaurants", restaurants);
+app.use("/chefs", chefsRoute);
+app.use("/recettes", recettesRoute);
+app.use("/restaurants", restaurantsRoute);
 
+// Start the server
 app.listen(port, () => {
-  console.log("Server running on " + port);
+  console.log(`Server running on port ${port}`);
 });

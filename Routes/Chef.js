@@ -1,52 +1,50 @@
 const express = require("express");
 const router = express.Router();
-const Chef = require("../Models/ChefModel");
+const Chef = require("../models/ChefsModel");
 
+// Get all chefs
 router.get("/all", async (req, res) => {
-  const chefs = await Chef.find();
-  res.json(chefs);
+  try {
+    const chefs = await Chef.find();
+    res.json(chefs);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
-router.get("/names", async (req, res) => {
-  const chefs = await Chef.find({}, "name");
-  res.json(chefs);
-});
-
-router.get("/recettes", async (req, res) => {
-  const chefs = await Chef.aggregate([
-    {
-      $lookup: {
-        from: "recettes",
-        localField: "_id",
-        foreignField: "chef",
-        as: "recettes",
-      },
-    },
-    {
-      $project: {
-        name: 1,
-        numRecettes: { $size: "$recettes" },
-      },
-    },
-  ]);
-  res.json(chefs);
-});
-
-router.post("/add", (req, res) => {
+// Add a chef
+router.post("/add", async (req, res) => {
   const chef = new Chef(req.body);
-  chef.save().then((newChef) => res.json(newChef));
+  try {
+    const savedChef = await chef.save();
+    res.status(201).json(savedChef);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
-router.put("/update/:name", (req, res) => {
-  Chef.updateOne({ name: req.params.name }, req.body).then((updatedChef) =>
-    res.json(updatedChef)
-  );
+// Update a chef by name
+router.put("/update/:name", async (req, res) => {
+  try {
+    const updatedChef = await Chef.findOneAndUpdate(
+      { name: req.params.name },
+      req.body,
+      { new: true }
+    );
+    res.json(updatedChef);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
-router.delete("/delete/:name", (req, res) => {
-  Chef.deleteOne({ name: req.params.name }).then(() =>
-    res.json({ message: "Chef deleted" })
-  );
+// Delete a chef by name
+router.delete("/delete/:name", async (req, res) => {
+  try {
+    await Chef.findOneAndDelete({ name: req.params.name });
+    res.json({ message: "Chef deleted" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
 module.exports = router;
