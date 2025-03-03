@@ -23,10 +23,12 @@ mongoose
 const chefsRoute = require("./routes/chef");
 const recettesRoute = require("./routes/recette");
 const restaurantsRoute = require("./routes/restaurant");
+const loginRoute = require("./routes/Login");
 
 app.use("/chefs", chefsRoute);
 app.use("/recettes", recettesRoute);
 app.use("/restaurants", restaurantsRoute);
+app.use("/Login", loginRoute);
 
 // Start the server
 app.listen(port, () => {

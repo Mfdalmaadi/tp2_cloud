@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const Chef = require("../models/ChefsModel");
 
-// Get all chefs
 router.get("/all", async (req, res) => {
   try {
     const chefs = await Chef.find();
@@ -12,7 +11,6 @@ router.get("/all", async (req, res) => {
   }
 });
 
-// Add a chef
 router.post("/add", async (req, res) => {
   const chef = new Chef(req.body);
   try {
@@ -23,7 +21,6 @@ router.post("/add", async (req, res) => {
   }
 });
 
-// Update a chef by name
 router.put("/update/:name", async (req, res) => {
   try {
     const updatedChef = await Chef.findOneAndUpdate(
@@ -37,7 +34,6 @@ router.put("/update/:name", async (req, res) => {
   }
 });
 
-// Delete a chef by name
 router.delete("/delete/:name", async (req, res) => {
   try {
     await Chef.findOneAndDelete({ name: req.params.name });
